@@ -7,6 +7,7 @@ let player = {
   height: 20,
   color: 'red'
 };
+let mousePos;
 
 window.onload = function init() {
   canvas = document.querySelector('#myCanvas');
@@ -16,6 +17,9 @@ window.onload = function init() {
 
   //draw 10 balls
   balls = createBalls(10);
+
+  //event listener for moving player with mouse
+  canvas.addEventListener('mousemove', mouseMoved);
 
   mainLoop();
 };
@@ -27,12 +31,34 @@ function mainLoop() {
   // draw
   drawFilledRectangle(player);
   drawAllBalls(balls);
+  drawNumberOfBallsAlive(balls);
 
   // move the objects
   moveAllBalls(balls);
+  movePlayerWithMouse();
 
   // call frame movement
   requestAnimationFrame(mainLoop);
+}
+
+function mouseMoved(evt) {
+  mousePos = getMousePos(canvas, evt);
+}
+
+function getMousePos(canvas, evt) {
+  let rect = canvas.getBoundingClientRect();
+  return {
+    x: evt.clientX - rect.left,
+    y: evt.clientY - rect.top
+  };
+}
+
+function movePlayerWithMouse() {
+  if (mousePos !== undefined) {
+    player.x = mousePos.x - player.width / 2;
+    player.y = mousePos.y - player.height / 2;
+
+  }
 }
 
 function createBalls(n) {
@@ -54,17 +80,7 @@ function createBalls(n) {
 }
 
 function getARandomColor() {
-  let colors = ['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6',
-    '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D',
-    '#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A',
-    '#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC',
-    '#66994D', '#B366CC', '#4D8000', '#B33300', '#CC80CC',
-    '#66664D', '#991AFF', '#E666FF', '#4DB3FF', '#1AB399',
-    '#E666B3', '#33991A', '#CC9999', '#B3B31A', '#00E680',
-    '#4D8066', '#809980', '#E6FF80', '#1AFF33', '#999933',
-    '#FF3380', '#CCCC00', '#66E64D', '#4D80CC', '#9900B3',
-    '#E64D66', '#4DB380', '#FF4D4D', '#99E6E6', '#6666FF'
-  ];
+  let colors = ['red', 'blue', 'cyan', 'purple', 'pink', 'green', 'yellow'];
 
   let colorIndex = Math.round((colors.length - 1) * Math.random());
 
@@ -79,11 +95,12 @@ function drawAllBalls(ballArray) {
 }
 
 function moveAllBalls(ballArray) {
-  ballArray.forEach(function(b) {
+  ballArray.forEach(function(b, index) {
     b.x += b.speedX;
     b.y += b.speedY;
 
     testCollisionBallWithWalls(b);
+    testCollisionWithPlayer(b, index);
   });
 }
 
@@ -105,6 +122,48 @@ function testCollisionBallWithWalls(b) {
     b.speedY = -b.speedY;
     b.y = b.radius;
   }
+}
+
+// Detecting collision between circle and rectangle
+
+function circRectsOverlap(x0, y0, w0, h0, cx, cy, r) {
+  let testX = cx;
+  let testY = cy;
+
+  if (testX < x0) {
+    testX = x0;
+  }
+  if (testX > (x0 + w0)) {
+    testX = (x0 + w0);
+  }
+  if (testY < y0) {
+    testY = y0;
+  }
+  if (testY > (y0 + h0)) {
+    testY = (y0 + h0);
+  }
+  return (((cx - testX) * (cx - testX) + (cy - testY) * (cy - testY)) < r * r);
+}
+
+// Detecting collision between balls and player and remouve the ball which collided
+
+function testCollisionWithPlayer(b, index) {
+  if (circRectsOverlap(player.x, player.y, player.width, player.height, b.x, b.y, b.radius)) {
+    balls.splice(index, 1);
+  }
+}
+
+//Point counter - number of balls still in game. At 0 you win.
+
+function drawNumberOfBallsAlive(balls) {
+  ctx.save();
+  ctx.font = '30px Arial';
+  if (balls.length === 0) {
+    ctx.fillText('YOU WIN', 20, 30);
+  } else {
+    ctx.fillText(balls.length, 20, 30);
+  }
+  ctx.restore();
 }
 
 
