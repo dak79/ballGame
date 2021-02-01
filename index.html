@@ -11,6 +11,28 @@
   </head>
 
   <body>
+    <div id="controls">
+      <label for="nbBalls">Number of balls: </label>
+      <input type="number" min="1" max="30" value="10" id="nbBalls" oninput="changeNbBalls(this.value);">
+      <p></p>
+
+      <label for="nbPlayerColor">Player color: </label>
+      <input type="color" value="#FF0000" oninput="changePlayerColor(this.value);" id="nbPlayerColor">
+      <p></p>
+
+      <label for="nbBallsToEat">Color of ball to eat: </label>
+      <select onchange="changeColorToEat(this.value);" id="nbBallsToEat">
+        <option value="red">red</option>
+        <option value="blue">blue</option>
+        <option value="green">green</option>
+      </select>
+      <p></p>
+
+      <label for="nbBallsSpeed">Change ball speed: </label>
+      - <input type="range" value="1" min="0.1" max="3" step="0.1" oninput="changeBallSpeed(this.value);" id="#nbBallsSpeed"> +
+      <p></p>
+
+    </div>
     <canvas id="myCanvas" width="400" height="400"> Your browser can't display canvas...</canvas>
   </body>
 
