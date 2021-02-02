@@ -1,8 +1,6 @@
 // useful to have them as global letiables
 let canvas, ctx, w, h;
 let mousePos;
-
-// an empty array!
 let balls = [];
 let initialNumberOfBalls;
 let globalSpeedMutiplier = 1;
@@ -157,6 +155,7 @@ function getARandomColor() {
   // return the random color
   return c;
 }
+
 
 function drawBallNumbers(balls) {
   ctx.save();
